@@ -30,4 +30,6 @@ export const kotdService = {
     const response = await apiClient.post(`/kotd/${jerseyId}/like`);
     return response.data;
   },
+
+ 
 };

@@ -229,4 +229,10 @@ export class JerseysController {
       clubData,
     );
   }
+
+  @Get(':id/likes')
+  @UseGuards(JwtAuthGuard)
+  async getJerseyLikes(@Param('id') jerseyId: string) {
+    return this.jerseysService.getJerseyLikes(jerseyId);
+  }
 }

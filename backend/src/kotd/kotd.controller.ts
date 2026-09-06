@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { KotdService } from './kotd.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('kotd')
 export class KotdController {
@@ -32,4 +33,8 @@ export class KotdController {
     const userId = (req as any).user?.userId;
     return this.kotdService.toggleLike(jerseyId, userId);
   }
+
+
+
+  
 }

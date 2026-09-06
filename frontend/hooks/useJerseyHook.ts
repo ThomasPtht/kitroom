@@ -88,6 +88,14 @@ export const useToggleLikeJersey = () => {
   });
 };
 
+export const useJerseyLikes = (jerseyId: string, enabled: boolean) => {
+  return useQuery({
+    queryKey: ["jerseyLikes", jerseyId],
+    queryFn: () => jerseyService.getJerseyLikes(jerseyId),
+    enabled,
+  });
+};
+
 export const useCollectionAnalytics = () => {
   return useQuery({
     queryKey: ["collectionAnalytics"],

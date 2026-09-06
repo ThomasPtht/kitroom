@@ -77,5 +77,10 @@ export const jerseyService = {
   deleteJersey: async (id: string) => {
     const { data } = await apiClient.delete(`/jerseys/${id}`);
     return data;
-  }
+  },
+
+  getJerseyLikes: async (jerseyId: string) => {
+    const { data } = await apiClient.get(`/jerseys/${jerseyId}/likes`);
+    return data;
+  },
 };

@@ -9,14 +9,17 @@ import {
   ActivityIndicator,
   SafeAreaView,
   Share,
+  Modal,
+  FlatList,
 } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Colors } from "@/constants/Colors";
-import { useToggleLikeJersey } from "@/hooks/useJerseyHook";
+import { useJerseyLikes, useToggleLikeJersey } from "@/hooks/useJerseyHook";
 import { useLocker } from "@/hooks/useLocker";
 import { calculateRank } from "@/lib/ranks";
 import { useTranslation } from "react-i18next";
+import { useUserMe } from "@/hooks/useAuthHook";
 
 export default function PublicLockerScreen() {
   const { t } = useTranslation();
@@ -25,6 +28,24 @@ export default function PublicLockerScreen() {
 
   const { data: profileData, isLoading } = useLocker(username as string);
   const { mutate: toggleLike } = useToggleLikeJersey();
+
+  const { data: userMe } = useUserMe();
+  const isOwnLocker = userMe?.username === username;
+
+  // State to track which jerseys have been liked by the current user
+  const [likesModalJerseyId, setLikesModalJerseyId] = useState<string | null>(
+    null,
+  );
+
+  const { data: likersList, isLoading: isLoadingLikers } = useJerseyLikes(
+    likesModalJerseyId ?? "",
+    !!likesModalJerseyId,
+  );
+
+  const handleUserPress = (likerUsername: string) => {
+    setLikesModalJerseyId(null);
+    router.push(`/locker/${likerUsername}`);
+  };
 
   // Local state to track which side (front/back) is displayed for each jersey { [jerseyId]: boolean }
   const [showBackImage, setShowBackImage] = useState<{
@@ -240,7 +261,15 @@ export default function PublicLockerScreen() {
                       styles.likeButtonMini,
                       jersey.hasLiked ? styles.likedBg : styles.unlikedBg,
                     ]}
-                    onPress={() => toggleLike(jersey.id)}
+                    onPress={() => {
+                      if (isOwnLocker) {
+                        setLikesModalJerseyId(jersey.id); // sur son propre locker : ouvre juste la liste
+                      } else {
+                        toggleLike(jersey.id); // sinon, comportement normal de like
+                      }
+                    }}
+                    onLongPress={() => setLikesModalJerseyId(jersey.id)} // appui long : voir la liste, même sur locker des autres
+                    disabled={isOwnLocker && false} // le bouton reste actif pour ouvrir la liste, juste le like est bloqué
                   >
                     <Ionicons
                       name="heart"
@@ -276,6 +305,55 @@ export default function PublicLockerScreen() {
           })}
         </View>
       </ScrollView>
+      <Modal
+        visible={!!likesModalJerseyId}
+        onRequestClose={() => setLikesModalJerseyId(null)}
+        transparent
+        animationType="fade"
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t("publicLocker.likedBy")}</Text>
+              <TouchableOpacity onPress={() => setLikesModalJerseyId(null)}>
+                <Ionicons name="close" size={22} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+
+            {isLoadingLikers ? (
+              <ActivityIndicator
+                color={Colors.theme.primary}
+                style={{ marginVertical: 20 }}
+              />
+            ) : (
+              <FlatList
+                data={likersList ?? []}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.likerRow}
+                    onPress={() => handleUserPress(item.username)}
+                  >
+                    <View style={styles.likerAvatar}>
+                      <Ionicons
+                        name="person"
+                        size={16}
+                        color={Colors.theme.primary}
+                      />
+                    </View>
+                    <Text style={styles.likerUsername}>@{item.username}</Text>
+                  </TouchableOpacity>
+                )}
+                ListEmptyComponent={
+                  <Text style={styles.emptyLikesText}>
+                    {t("publicLocker.noLikesYet")}
+                  </Text>
+                }
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -574,5 +652,54 @@ const styles = StyleSheet.create({
     color: Colors.theme.textMuted,
     fontSize: 12,
     textTransform: "capitalize",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: "#161616",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: "60%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  likerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#222222",
+  },
+  likerAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(5, 199, 133, 0.1)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  likerUsername: {
+    fontSize: 14,
+    color: "#FFFFFF",
+    fontWeight: "500",
+  },
+  emptyLikesText: {
+    color: Colors.theme.textMuted,
+    textAlign: "center",
+    paddingVertical: 20,
   },
 });

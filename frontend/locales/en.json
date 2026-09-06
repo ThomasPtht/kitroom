@@ -251,7 +251,9 @@
     "buttons": {
       "front": "FRONT",
       "back": "BACK"
-    }
+    },
+     "likedBy": "Aimé par",
+  "noLikesYet": "Personne n'a encore aimé ce maillot"
   },
   "analytics": {
     "loading": "Loading...",

@@ -604,4 +604,18 @@ export class JerseysService {
 
     return this.signJersey(updatedJersey);
   }
+
+  async getJerseyLikes(jerseyId: string) {
+    const likes = await this.prisma.jerseyLike.findMany({
+      where: { jerseyId },
+      include: {
+        user: { select: { id: true, username: true } },
+      },
+    });
+
+    return likes.map((like) => ({
+      id: like.user.id,
+      username: like.user.username,
+    }));
+  }
 }
