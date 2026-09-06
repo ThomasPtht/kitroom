@@ -297,7 +297,10 @@ export default function PublicLockerScreen() {
                     {jersey.club?.name}
                   </Text>
                   <Text style={styles.jerseySeasonType}>
-                    {jersey.season} {jersey.type ? `/ ${jersey.type}` : ""}
+                    {jersey.season}{" "}
+                    {jersey.type
+                      ? `/ ${t(`addJersey.types.${jersey.type.toUpperCase()}`)}`
+                      : ""}
                   </Text>
                 </View>
               </View>

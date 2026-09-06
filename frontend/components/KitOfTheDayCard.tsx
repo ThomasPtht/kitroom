@@ -144,7 +144,7 @@ export default function KitOfTheDayCard() {
                   {jersey.club.name}
                 </Text>
                 <Text style={styles.seasonType}>
-                  {jersey.season} / {formatText(jersey.type)}
+                  {jersey.season} / {t(`addJersey.types.${jersey.type}`)}
                 </Text>
 
                 <Text style={styles.story} numberOfLines={2}>
