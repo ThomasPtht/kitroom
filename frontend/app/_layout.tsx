@@ -6,7 +6,7 @@ import {
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "react-native-reanimated";
 import Toast from "react-native-toast-message";
 import { useColorScheme } from "@/components/useColorScheme";
@@ -22,6 +22,7 @@ import {
   Inter_500Medium,
   Inter_600SemiBold,
 } from "@expo-google-fonts/inter";
+import { authService } from "@/services/auth.service";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -90,28 +91,29 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = await authService.getToken();
+      setIsAuthenticated(!!token);
+      setIsCheckingAuth(false);
+    };
+    checkAuth();
+  }, []);
+
+  if (isCheckingAuth) {
+    return null;
+  }
+
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)/splash" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="(auth)/onboarding"
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="(auth)/forgot-password"
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="(auth)/reset-password"
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="(auth)/change-password"
-          options={{ headerShown: false }}
-        />
+      <Stack
+        screenOptions={{ headerShown: false }}
+        initialRouteName={isAuthenticated ? "(drawer)" : "(auth)"}
+      >
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen
           name="locker/[username]"
           options={{ headerShown: false }}
@@ -121,7 +123,7 @@ function RootLayoutNav() {
           name="settings"
           options={{
             headerShown: false,
-            animation: "slide_from_right", // Force the slide animation for the settings screen
+            animation: "slide_from_right",
           }}
         />
         <Stack.Screen
@@ -145,7 +147,6 @@ function RootLayoutNav() {
             animation: "slide_from_right",
           }}
         />
-
         <Stack.Screen
           name="subscription"
           options={{
