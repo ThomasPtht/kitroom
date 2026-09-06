@@ -1,16 +1,18 @@
-import { apiClient } from "@/services/api";
 import { JerseyData } from "@/services/jersey.service";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   View,
   Text,
   StyleSheet,
   Image,
+  Modal,
+  FlatList,
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
   Alert,
   Share,
+  ActivityIndicator,
 } from "react-native";
 import {
   AntDesign,
@@ -25,7 +27,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { captureRef } from "react-native-view-shot";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
-import { useDeleteJersey } from "@/hooks/useJerseyHook";
+import { useDeleteJersey, useJerseyLikes } from "@/hooks/useJerseyHook";
 
 interface JerseyDetailProps {
   jersey: JerseyData & { likesCount?: number };
@@ -46,6 +48,12 @@ export default function JerseyDetail({ jersey, onClose }: JerseyDetailProps) {
     ? jersey.backImageUrl || jersey.frontImageUrl || jersey.frontImageUri
     : jersey.frontImageUrl || jersey.frontImageUri;
 
+  const [showLikesModal, setShowLikesModal] = useState(false);
+  const { data: likersList, isLoading: isLoadingLikers } = useJerseyLikes(
+    jersey.id as string,
+    showLikesModal,
+  );
+
   const cardRef = useRef<View>(null);
   const [isSharing, setIsSharing] = useState(false);
 
@@ -54,6 +62,14 @@ export default function JerseyDetail({ jersey, onClose }: JerseyDetailProps) {
   const queryClient = useQueryClient();
 
   const { mutate: deleteJersey, isLoading: isDeleting } = useDeleteJersey();
+
+  const handleUserPress = (likerUsername: string) => {
+    setShowLikesModal(false);
+    setTimeout(() => {
+      onClose();
+      router.push(`/locker/${likerUsername}`);
+    }, 150); // laisse le temps à l'animation de fermeture du modal de se terminer
+  };
 
   const handleDelete = () => {
     Alert.alert(
@@ -250,7 +266,10 @@ export default function JerseyDetail({ jersey, onClose }: JerseyDetailProps) {
 
           {/* Like badge */}
           {(jersey.likesCount ?? 0) > 0 && (
-            <View style={styles.likesBadge}>
+            <TouchableOpacity
+              style={styles.likesBadge}
+              onPress={() => setShowLikesModal(true)}
+            >
               <Ionicons name="heart" size={13} color="#05C785" />
               <Text style={styles.likesCountText}>{jersey.likesCount}</Text>
               <Text style={styles.likesLabelText}>
@@ -258,7 +277,7 @@ export default function JerseyDetail({ jersey, onClose }: JerseyDetailProps) {
                   ? t("jerseyDetail.likes")
                   : t("jerseyDetail.likes_plural")}
               </Text>
-            </View>
+            </TouchableOpacity>
           )}
         </View>
 
@@ -409,6 +428,51 @@ export default function JerseyDetail({ jersey, onClose }: JerseyDetailProps) {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <Modal
+        visible={showLikesModal}
+        onRequestClose={() => setShowLikesModal(false)}
+        transparent
+        animationType="fade"
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t("jerseyDetail.likedBy")}</Text>
+              <TouchableOpacity onPress={() => setShowLikesModal(false)}>
+                <Ionicons name="close" size={22} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+
+            {isLoadingLikers ? (
+              <ActivityIndicator
+                color="#05C785"
+                style={{ marginVertical: 20 }}
+              />
+            ) : (
+              <FlatList
+                data={likersList ?? []}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.likerRow}
+                    onPress={() => handleUserPress(item.username)}
+                  >
+                    <View style={styles.likerAvatar}>
+                      <Ionicons name="person" size={16} color="#05C785" />
+                    </View>
+                    <Text style={styles.likerUsername}>@{item.username}</Text>
+                  </TouchableOpacity>
+                )}
+                ListEmptyComponent={
+                  <Text style={styles.emptyLikesText}>
+                    {t("jerseyDetail.noLikesYet")}
+                  </Text>
+                }
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -753,5 +817,66 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 12,
     fontWeight: "bold",
+  },
+  likesButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    alignSelf: "flex-start",
+    marginTop: 8,
+  },
+  likesButtonText: {
+    color: "#05C785",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: "#161616",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: "60%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  likerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#222222",
+  },
+  likerAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(5, 199, 133, 0.1)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  likerUsername: {
+    fontSize: 14,
+    color: "#FFFFFF",
+    fontWeight: "500",
+  },
+  emptyLikesText: {
+    color: "#666666",
+    textAlign: "center",
+    paddingVertical: 20,
   },
 });

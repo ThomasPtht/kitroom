@@ -19,6 +19,7 @@ interface KitOfTheDayModalProps {
   onClose: () => void;
   jersey: any;
   onToggleLike: (id: string) => void;
+  isOwnJersey: boolean;
 }
 
 export default function KitOfTheDayModal({
@@ -26,6 +27,7 @@ export default function KitOfTheDayModal({
   onClose,
   jersey,
   onToggleLike,
+  isOwnJersey,
 }: KitOfTheDayModalProps) {
   const { t } = useTranslation();
 
@@ -134,7 +136,10 @@ export default function KitOfTheDayModal({
                   : styles.notLikedBackground,
               ]}
               activeOpacity={0.7}
-              onPress={() => onToggleLike(jersey.id)}
+              disabled={isOwnJersey} // Désactive le bouton si c'est le maillot de l'utilisateur
+              onPress={() => {
+                if (!isOwnJersey) onToggleLike(jersey.id);
+              }}
             >
               <Ionicons
                 name="heart"

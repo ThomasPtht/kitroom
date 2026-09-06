@@ -615,6 +615,8 @@
   "shareKit": "Partager",
   "deleteButton": "Supprimer",
   "editButton": "Modifier",
+  "likedBy": "Aimé par",
+  "noLikesYet": "Personne n'a encore aimé ce maillot",
   "alerts": {
     "deleteTitle": "Supprimer le maillot",
     "deleteMessage": "Êtes-vous sûr de vouloir supprimer ce maillot de votre collection ?",
@@ -629,6 +631,7 @@
   },
   "shareMessage": "Découvrez ce maillot de ma collection ! 👕✨ Rejoignez-moi sur KITOYA pour créer et exposer votre vestiaire de football ultime : https://kitoya.app",
   "shareTitle": "Découvrez ce maillot de foot !"
+
 },
 "kitOfTheDay": {
   "headerTitle": "MAILLOT DE LA COMMUNAUTÉ",

@@ -609,6 +609,9 @@
   "shareKit": "Share",
   "deleteButton": "Delete",
   "editButton": "Edit",
+  "likesMin": "j'aime",
+  "likedBy": "Aimé par",
+  "noLikesYet": "Personne n'a encore aimé ce maillot",
   "alerts": {
     "deleteTitle": "Delete",
     "deleteMessage": "Are you sure you want to delete this jersey from your collection?",

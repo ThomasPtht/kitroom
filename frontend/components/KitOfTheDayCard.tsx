@@ -14,6 +14,7 @@ import { Colors } from "@/constants/Colors";
 import { useJerseyOfTheDay, useToggleLikeJersey } from "@/hooks/useJerseyHook";
 import KitOfTheDayModal from "./KitOfTheDayModal";
 import { useTranslation } from "react-i18next";
+import { useUserMe } from "@/hooks/useAuthHook";
 
 // Helper to format types/conditions cleanly (e.g. "HOME_KIT" -> "Home kit")
 export const formatText = (text: string | null | undefined) => {
@@ -30,6 +31,10 @@ export default function KitOfTheDayCard() {
   const { data: jersey, isLoading, isError } = useJerseyOfTheDay();
   const [imageFailed, setImageFailed] = useState(false);
   const { mutate: toggleLike, isPending: isLiking } = useToggleLikeJersey();
+
+  const { data: userMe } = useUserMe();
+
+  const isOwnJersey = userMe?.username === jersey?.user.username;
 
   // State to control modal visibility
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -188,9 +193,9 @@ export default function KitOfTheDayCard() {
                   : styles.notLikedBackground,
               ]}
               activeOpacity={0.7}
-              disabled={isLiking}
+              disabled={isLiking || isOwnJersey} // Disable if liking or if it's the user's own jersey
               onPress={() => {
-                toggleLike(jersey.id);
+                if (!isOwnJersey) toggleLike(jersey.id);
               }}
             >
               <Ionicons
@@ -217,6 +222,7 @@ export default function KitOfTheDayCard() {
         onClose={() => setIsModalVisible(false)}
         jersey={jersey}
         onToggleLike={(id) => toggleLike(id)}
+        isOwnJersey={isOwnJersey}
       />
     </>
   );
