@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useUserMe } from "@/hooks/useAuthHook";
@@ -55,11 +55,7 @@ export default function OnboardingScreen() {
 
           <View style={styles.stepCard}>
             <View style={styles.stepIconContainer}>
-              <Feather
-                name="file-text"
-                size={20}
-                color={Colors.theme.primary}
-              />
+              <Ionicons name="shirt" size={20} color={Colors.theme.primary} />
             </View>
             <View style={styles.stepTextContainer}>
               <Text style={styles.stepTitle}>{t("onboarding.step2Title")}</Text>
@@ -71,7 +67,11 @@ export default function OnboardingScreen() {
 
           <View style={styles.stepCard}>
             <View style={styles.stepIconContainer}>
-              <Feather name="archive" size={20} color={Colors.theme.primary} />
+              <AntDesign
+                name="line-chart"
+                size={20}
+                color={Colors.theme.primary}
+              />
             </View>
             <View style={styles.stepTextContainer}>
               <Text style={styles.stepTitle}>{t("onboarding.step3Title")}</Text>
