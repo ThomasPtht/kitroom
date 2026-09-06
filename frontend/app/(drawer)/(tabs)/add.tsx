@@ -105,8 +105,10 @@ export default function TabAddScreen() {
   // ==========================================
   const { data: jerseys } = useJerseys();
   const { data: sports } = useSports();
-  const { mutate: createJersey, isPending: isCreating } = useCreateJersey();
-  const { mutate: updateJersey, isPending: isUpdating } = useUpdateJersey();
+  const { mutateAsync: createJersey, isPending: isCreating } =
+    useCreateJersey();
+  const { mutateAsync: updateJersey, isPending: isUpdating } =
+    useUpdateJersey();
   const isPending = isCreating || isUpdating;
 
   const existingJersey = isEditing

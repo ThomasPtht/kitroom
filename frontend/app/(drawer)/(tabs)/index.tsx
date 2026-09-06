@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 25,
+    paddingTop: 22,
   },
   archiveCard: {
     backgroundColor: Colors.theme.surface,

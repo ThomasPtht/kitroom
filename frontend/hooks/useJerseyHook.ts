@@ -113,7 +113,7 @@ export const useUpdateJersey = () => {
       queryClient.invalidateQueries({ queryKey: ["jerseys"] });
       queryClient.invalidateQueries({ queryKey: ["jerseyCount"] });
       queryClient.invalidateQueries({ queryKey: ["mostRepresentedClub"] });
-      queryClient.invalidateQueries({ queryKey: ["collectionsAnalytics"] });
+      queryClient.invalidateQueries({ queryKey: ["collectionAnalytics"] });
     },
     onError: (error) => {
       console.error("Error updating jersey:", error);
