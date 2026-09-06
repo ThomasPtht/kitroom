@@ -23,6 +23,7 @@ import {
   Inter_600SemiBold,
 } from "@expo-google-fonts/inter";
 import { authService } from "@/services/auth.service";
+import { useNotificationResponseListener } from "@/services/notifications.service";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -102,6 +103,8 @@ function RootLayoutNav() {
     };
     checkAuth();
   }, []);
+
+  useNotificationResponseListener();
 
   if (isCheckingAuth) {
     return null;

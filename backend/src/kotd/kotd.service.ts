@@ -241,7 +241,7 @@ export class KotdService {
           jersey.user.expoPushToken,
           notifTranslations.likeTitle,
           notifTranslations.likeBody(likerName, jersey.club.name),
-          { type: 'like', jerseyId: jersey.id },
+          { type: 'like', jerseyId: jersey.id, username: jersey.user.username },
         );
       }
 

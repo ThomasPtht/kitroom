@@ -2,6 +2,8 @@ import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
+import { useEffect } from "react";
+import { router } from "expo-router";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -61,4 +63,26 @@ export async function registerForPushNotificationsAsync() {
   }
 
   return token;
+}
+
+/**
+ * Hook that listens for a tap on a received push notification and
+ * navigates to the relevant screen based on its data payload.
+ */
+export function useNotificationResponseListener() {
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        const data = response.notification.request.content.data;
+
+        if (data?.type === "like" && data?.username) {
+          router.push(`/locker/${data.username}`);
+        } else if (data?.type === "kotd") {
+          router.push("/(drawer)/(tabs)");
+        }
+      },
+    );
+
+    return () => subscription.remove();
+  }, []);
 }

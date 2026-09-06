@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.theme.surface,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: Colors.theme.primary,
+    borderColor: "rgba(255,255,255,0.08)",
     padding: 12,
   },
   jerseyImageContainer: {
