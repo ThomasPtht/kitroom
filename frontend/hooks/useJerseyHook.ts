@@ -69,7 +69,7 @@ export const useToggleLikeJersey = () => {
     mutationFn: (jerseyId: string) => kotdService.toggleLike(jerseyId),
     // Update the cached data for the jersey of the day after toggling like
     onSuccess: (data: { liked: boolean }) => {
-      queryClient.setQueryData(["kotd"], (oldData: any) => {
+      queryClient.setQueryData(["kotd", i18n.language], (oldData: any) => {
         if (!oldData) return oldData;
         return {
           ...oldData,
@@ -130,6 +130,7 @@ export const useDeleteJersey = () => {
       queryClient.invalidateQueries({ queryKey: ["jerseyCount"] });
       queryClient.invalidateQueries({ queryKey: ["mostRepresentedClub"] });
       queryClient.invalidateQueries({ queryKey: ["collectionAnalytics"] });
+      queryClient.invalidateQueries({ queryKey: ["kotd"] });
     },
     onError: (error) => {
       console.error("Error deleting jersey:", error);
